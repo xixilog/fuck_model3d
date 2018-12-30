@@ -4,6 +4,7 @@ from flask import (
 )
 import requests
 import time
+import shelve
 
 app = Flask(__name__, static_url_path='')
 app.debug=True
@@ -29,9 +30,26 @@ def uuid_name(uuid):
     parameter = parameter.replace(path, "")
 
     if request.method == 'HEAD':
-        r = requests.head('http://model3d.4dage.com/model/' + str(uuid) + ".4dage" + parameter)
-    elif request.method == 'GET':
-        r = requests.get('http://model3d.4dage.com/model/' + str(uuid) + ".4dage" + parameter)
+        try:
+            with shelve.open('shelve.db') as db:
+                name = str(uuid) + "_4dage_HEAD"
+                r = db[name]
+        except:
+            r = requests.head('http://model3d.4dage.com/model/' + str(uuid) + ".4dage" + parameter)
+            with shelve.open('shelve.db') as db:
+                name = str(uuid) + "_4dage_HEAD"
+                db[name] = r
+
+    if request.method == 'GET':
+        try:
+            with shelve.open('shelve.db') as db:
+                name = str(uuid) + "_4dage_GET"
+                r = db[name]
+        except:
+            r = requests.get('http://model3d.4dage.com/model/' + str(uuid) + ".4dage" + parameter)
+            with shelve.open('shelve.db') as db:
+                name = str(uuid) + "_4dage_GET"
+                db[name] = r
 
     return Response(r.content, content_type="application/octet-stream")
 
@@ -42,7 +60,17 @@ def thumbnail_jpg(uuid):
     path = request.path
     parameter = url.replace("http://127.0.0.1:5000", "")
     parameter = parameter.replace(path, "")
-    r = requests.get('http://model3d.4dage.com/model/' + str(uuid) + "/thumbnail.jpg" + parameter)
+    db = shelve.open('shelve.db')
+
+    try:
+        name = str(uuid) + "_thumbnail"
+        r = db[name]
+    except:
+        r = requests.get('http://model3d.4dage.com/model/' + str(uuid) + "/thumbnail.jpg" + parameter)
+        name = str(uuid) + "_thumbnail"
+        db[name] = r
+        
+    db.close()
     resp = Response(r, mimetype="image/jpeg")
     return resp
 
