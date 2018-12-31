@@ -26,7 +26,7 @@ def showModel_html():
 def uuid_name(uuid):
     url = request.url
     path = request.path
-    parameter = url.replace("http://127.0.0.1:5000", "")
+    parameter = url.replace("https://3d.xixilog.com", "")
     parameter = parameter.replace(path, "")
 
     if request.method == 'HEAD':
@@ -58,7 +58,7 @@ def uuid_name(uuid):
 def thumbnail_jpg(uuid):
     url = request.url
     path = request.path
-    parameter = url.replace("http://127.0.0.1:5000", "")
+    parameter = url.replace("https://3d.xixilog.com", "")
     parameter = parameter.replace(path, "")
     db = shelve.open('shelve.db')
 
@@ -69,11 +69,12 @@ def thumbnail_jpg(uuid):
         r = requests.get('http://model3d.4dage.com/model/' + str(uuid) + "/thumbnail.jpg" + parameter)
         name = str(uuid) + "_thumbnail"
         db[name] = r
-        
+
     db.close()
     resp = Response(r, mimetype="image/jpeg")
     return resp
 
 
-if __name__ == '__main__':
-    app.run()
+app.run(debug=True,
+        port=5001,
+        ssl_context=("3d.xixilog.com.pem", "3d.xixilog.com.key"))
