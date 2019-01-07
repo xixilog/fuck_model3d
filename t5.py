@@ -45,6 +45,8 @@ def uuid_name(uuid):
             with shelve.open('shelve.db') as db:
                 name = str(uuid) + "_4dage_GET"
                 r = db[name]
+                with open(str(uuid) + '.4dage', 'wb') as file:
+                    file.write(r.content)
         except:
             r = requests.get('http://model3d.4dage.com/model/' + str(uuid) + ".4dage" + parameter)
             with shelve.open('shelve.db') as db:
@@ -65,6 +67,8 @@ def thumbnail_jpg(uuid):
     try:
         name = str(uuid) + "_thumbnail"
         r = db[name]
+        with open('thumbnail.jpg', 'wb') as file:
+            file.write(r.content)
     except:
         r = requests.get('http://model3d.4dage.com/model/' + str(uuid) + "/thumbnail.jpg" + parameter)
         name = str(uuid) + "_thumbnail"
