@@ -4,11 +4,13 @@ from flask import (
 )
 import requests
 import time
-import shelve
+import os
+
 
 app = Flask(__name__, static_url_path='')
 app.debug=True
 
+the_url = "http://127.0.0.1:5000"
 
 @app.route('/')
 def model():
@@ -26,55 +28,33 @@ def showModel_html():
 def uuid_name(uuid):
     url = request.url
     path = request.path
-    parameter = url.replace("https://3d.xixilog.com", "")
+    parameter = url.replace("http://127.0.0.1:5000", "")
     parameter = parameter.replace(path, "")
 
     if request.method == 'HEAD':
-        try:
-            with shelve.open('shelve.db') as db:
-                name = str(uuid) + "_4dage_HEAD"
-                r = db[name]
-        except:
-            r = requests.head('http://model3d.4dage.com/model/' + str(uuid) + ".4dage" + parameter)
-            with shelve.open('shelve.db') as db:
-                name = str(uuid) + "_4dage_HEAD"
-                db[name] = r
+        r = requests.head('http://model3d.4dage.com/model/' + str(uuid) + ".4dage" + parameter)
 
     if request.method == 'GET':
-        try:
-            with shelve.open('shelve.db') as db:
-                name = str(uuid) + "_4dage_GET"
-                r = db[name]
-                with open(str(uuid) + '.4dage', 'wb') as file:
-                    file.write(r.content)
-        except:
-            r = requests.get('http://model3d.4dage.com/model/' + str(uuid) + ".4dage" + parameter)
-            with shelve.open('shelve.db') as db:
-                name = str(uuid) + "_4dage_GET"
-                db[name] = r
+        r = requests.get('http://model3d.4dage.com/model/' + str(uuid) + ".4dage" + parameter)
+        with open(str(uuid) + '.4dage', 'wb') as file:
+            file.write(r.content)
 
     return Response(r.content, content_type="application/octet-stream")
+
 
 
 @app.route('/<uuid>/thumbnail.jpg')
 def thumbnail_jpg(uuid):
     url = request.url
     path = request.path
-    parameter = url.replace("https://3d.xixilog.com", "")
+    parameter = url.replace("http://127.0.0.1:5000", "")
     parameter = parameter.replace(path, "")
-    db = shelve.open('shelve.db')
+    r = requests.get('http://model3d.4dage.com/model/' + str(uuid) + "/thumbnail.jpg" + parameter)
 
-    try:
-        name = str(uuid) + "_thumbnail"
-        r = db[name]
-        with open('thumbnail.jpg', 'wb') as file:
-            file.write(r.content)
-    except:
-        r = requests.get('http://model3d.4dage.com/model/' + str(uuid) + "/thumbnail.jpg" + parameter)
-        name = str(uuid) + "_thumbnail"
-        db[name] = r
-
-    db.close()
+    if not os.path.exists(str(uuid)):
+        os.makedirs(str(uuid))
+    with open(str(uuid) + '/thumbnail.jpg', 'wb') as file:
+        file.write(r.content)
     resp = Response(r, mimetype="image/jpeg")
     return resp
 
