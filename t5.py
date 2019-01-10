@@ -79,6 +79,4 @@ def thumbnail_jpg(uuid):
     return resp
 
 
-app.run(debug=True,
-        port=5001,
-        ssl_context=("3d.xixilog.com.pem", "3d.xixilog.com.key"))
+app.run()
