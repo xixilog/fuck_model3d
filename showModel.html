@@ -13,7 +13,7 @@
     <meta http-equiv="Cache" content="no-cache">
     <link rel="shortcut icon" href="images/favicon.ico" />
     <link rel="bookmark" href="images/favicon.ico" type="image/x-icon" 　 />
-    <title>建水紫陶 李映禄作品</title>
+    <title>小庭院</title>
     <link rel="icon" href="https://cdn.xixilog.com/favicon.ico">
     <script>
         var support = true;
@@ -171,7 +171,7 @@
 </head>
 
 <body>
-    <script>
+    <script type="text/javascript">
         window.name = window.location.href.substring(window.location.href.indexOf("=") + 1);
         if (name.indexOf("&") != -1) {
             name = name.substring(0, name.indexOf("&"));
@@ -222,16 +222,6 @@
     </script>
 
 </body>
-<script type="text/javascript">
-function showUnreadNews()
-{
-	$(document).ready(function() {
-		$(".home").remove();
-		$("#metaData").remove();
-		$('a').attr('href','');
-	});
-}
-setInterval('showUnreadNews()',100);
-</script>
+<script type="text/javascript" src='static/js/check.js'></script>
 
 </html>
